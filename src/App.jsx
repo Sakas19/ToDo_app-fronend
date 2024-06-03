@@ -9,7 +9,7 @@ function App() {
   const [errors, setErrors] = useState("")
 
   useEffect(() => {
-    axios.get("http://127.0.0.1:8000/todos")
+    axios.get("https://todo-app-2-bqzt.onrender.com/todos")
       .then(res => setTodos(res.data)) 
       .catch(err => setErrors(err.message))
     })
