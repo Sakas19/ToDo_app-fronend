@@ -1,23 +1,24 @@
-import { useState,useEffect } from "react";
-import axios from 'axios'
+import { useState, useEffect } from "react";
+import axios from 'axios';
 import Search from "./components/Search";
 import TodoList from "./components/TodoList";
 import Filter from "./components/Filter";
 
 function App() {
   const [todos, setTodos] = useState([]);
-  const [errors, setErrors] = useState("")
+  const [errors, setErrors] = useState("");
 
   useEffect(() => {
     axios.get("https://todo-app-2-bqzt.onrender.com/todos")
       .then(res => setTodos(res.data)) 
-      .catch(err => setErrors(err.message))
-    })
-  
+      .catch(err => setErrors(err.message));
+  }, []);
+
   const addTodo = (data) => {
+    const newId = todos.length > 0 ? parseInt(todos[todos.length - 1].id) + 1 : 1;
     setTodos([
       ...todos,
-      { ...data, id: parseInt(todos[todos.length - 1].id) + 1, status: "Active" },
+      { ...data, id: newId, status: "Active" },
     ]);
   };
 
@@ -27,17 +28,19 @@ function App() {
 
   const updateTodo = (e, id, text) => {
     e.preventDefault();
-    const todo = todos[id];
-    const updatedUser = { ...todo, task: text, status: "Active" };
-    setTodos(todos.map((t) => (t.id === todo.id ? updatedUser : t)));
+    const todoIndex = todos.findIndex(todo => todo.id === id);
+    if (todoIndex !== -1) {
+      const updatedTodo = { ...todos[todoIndex], task: text, status: "Active" };
+      const updatedTodos = [...todos];
+      updatedTodos[todoIndex] = updatedTodo;
+      setTodos(updatedTodos);
+    }
   };
 
   const completeTodo = (e, id) => {
-    if (e.target.checked) {
-      setTodos(todos.map((todo) => (todo.id === id ? { ...todo, status: "Completed" } : todo)));
-    } else {
-      setTodos(todos.map((todo) => (todo.id === id ? { ...todo, status: "Active" } : todo)));
-    }
+    setTodos(todos.map((todo) => 
+      todo.id === id ? { ...todo, status: e.target.checked ? "Completed" : "Active" } : todo
+    ));
   };
 
   const filterTodo = (cat_value) => {
@@ -54,4 +57,5 @@ function App() {
 }
 
 export default App;
+
 
